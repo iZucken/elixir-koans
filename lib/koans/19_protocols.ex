@@ -1,9 +1,14 @@
 defmodule Protocols do
+  alias Protocol.UndefinedError
   use Koans
 
   @intro "Want to follow the rules? Adhere to the protocol!"
 
-  defprotocol(Artist, do: def(perform(artist)))
+  # defprotocol(Artist, do: def(perform(artist)))
+
+  defprotocol Artist do
+    def perform(artist)
+  end
 
   defimpl Artist, for: Any do
     def perform(_) do
@@ -16,8 +21,15 @@ defmodule Protocols do
     defstruct name: ""
   end
 
-  defmodule(Musician, do: defstruct(name: "", instrument: ""))
-  defmodule(Dancer, do: defstruct(name: "", dance_style: ""))
+  defmodule Musician do
+    defstruct name: "", instrument: ""
+    # === defstruct(name: "", instrument: "")
+    # === defstruct [name: "", instrument: ""]
+    # === defstruct([name: "", instrument: ""])
+  end
+
+  defmodule(Dancer, [do: defstruct(name: "", dance_style: "")])
+
   defmodule(Physicist, do: defstruct(name: ""))
 
   defimpl Artist, for: Musician do
@@ -34,17 +46,17 @@ defmodule Protocols do
     musician = %Musician{name: "Andre", instrument: "violin"}
     dancer = %Dancer{name: "Darcy", dance_style: "ballet"}
 
-    assert Artist.perform(musician) == ___
-    assert Artist.perform(dancer) == ___
+    assert Artist.perform(musician) == "Andre played violin"
+    assert Artist.perform(dancer) == "Darcy performed ballet"
   end
 
   koan "Sometimes we all use the same" do
     painter = %Painter{name: "Emily"}
-    assert Artist.perform(painter) == ___
+    assert Artist.perform(painter) == "Artist showed performance"
   end
 
   koan "If you are not an artist, you can't show performance" do
-    assert_raise ___, fn ->
+    assert_raise UndefinedError, fn ->
       Artist.perform(%Physicist{name: "Delia"})
     end
   end
